@@ -99,15 +99,15 @@ func AddArticle (context *gin.Context ) {
 
 	code := e.INVALID_PARAMS
 	if ! valid.HasErrors() {
-		if models.ExistArticleById(tagId) {
+		if models.ExistTagById(tagId) {
 			data := make(map[string]interface {})
 			data["tag_id"] = tagId
 			data["title"] = title
 			data["desc"] = desc
 			data["content"] = content
 			data["created_by"] = createdBy
-			data["state"] = state
-	
+			data["state"] = int8(state)
+
 			models.AddArticle(data)
 			code = e.SUCCESS
 		} else {

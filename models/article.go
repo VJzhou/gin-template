@@ -67,7 +67,7 @@ func AddArticle (insert map[string]interface{}) bool {
 }
 
 func EditArticle (id int, update map[string]interface{}) bool {
-	db.Where("id = ?", id).Update(update)
+	db.Model(&Article{}).Where("id = ?", id).Updates(update)
 	return true
 }
 

@@ -55,6 +55,15 @@ func GetTagById (id int) *Tag {
 	return tag
 }
 
+func ExistTagById(id int) bool {
+	tag := GetTagById(id)
+	if tag.ID > 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (tag *Tag) BeforeCreate(scope *gorm.Scope) error  {
 	scope.SetColumn("CreatedOn", time.Now().Unix())
 	return nil
