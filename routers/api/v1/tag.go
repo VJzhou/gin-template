@@ -11,6 +11,12 @@ import (
 	"net/http"
 )
 
+// @Summary get article tag list
+// @Produce  json
+// @Param name body string true "Name"
+// @Param state body int false "State"
+// @Success 200 {object} gin.H
+// @Router /v1/tags/{id} [get]
 func GetTag(context *gin.Context)  {
 	name := context.Query("name")
 
@@ -39,6 +45,13 @@ func GetTag(context *gin.Context)  {
 	})
 }
 
+// @Summary add article tag
+// @Produce  json
+// @Param name body string true "Name"
+// @Param state body int false "State"
+// @Param modified_by body string true "ModifiedBy"
+// @Success 200 {object} gin.H
+// @Router /v1/tags/{id} [post]
 func AddTag(context *gin.Context)  {
 	name := context.Query("name")
 	state := com.StrTo(context.DefaultQuery("state", "0")).MustInt()
@@ -69,8 +82,14 @@ func AddTag(context *gin.Context)  {
 	})
 }
 
-
-
+// @Summary Update article tag
+// @Produce  json
+// @Param id path int true "ID"
+// @Param name body string true "Name"
+// @Param state body int false "State"
+// @Param modified_by body string true "ModifiedBy"
+// @Success 200 {object} gin.H
+// @Router /v1/tags/{id} [put]
 func EditTag(context *gin.Context)  {
 	id := com.StrTo(context.Query("id")).MustInt()
 	name := context.Query("name")

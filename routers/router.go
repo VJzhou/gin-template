@@ -1,13 +1,20 @@
 package routers
 
 import (
+	"gin-demo/middleware/jwt"
 	"gin-demo/pkg/setting"
+	"gin-demo/routers/api"
 	v1 "gin-demo/routers/api/v1"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/swaggo/gin-swagger/example/basic/docs"
 )
 
 func InitRouter() *gin.Engine {
 	route := gin.New()
+
+	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	route.Use(gin.Logger())
 
@@ -20,9 +27,11 @@ func InitRouter() *gin.Engine {
 	//		"message" : "test",
 	//	})
 	//})
+	route.GET("/auth", api.GetToken)
 
 	// 注册路由
 	v1Api := route.Group("/v1")
+	v1Api.Use(jwt.JWT())
 	{
 		v1Api.GET("/tag", v1.GetTag)
 		v1Api.POST("/tag", v1.AddTag)

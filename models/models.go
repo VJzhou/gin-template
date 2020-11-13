@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
+	"time"
 )
 
 var db *gorm.DB
@@ -53,8 +54,32 @@ func init() {
 	db.LogMode(true)
 	db.DB().SetMaxIdleConns(10)
 	db.DB().SetMaxOpenConns(100)
+	db.Callback().Create().Replace("gorm:update_time_stamp", updateTimeStampCreateCallback)
+	db.Callback().Update().Replace("gorm:update_time_stamp", updateTimeStampForUpdateCallback)
 }
 
 func CloseDB()  {
 	defer db.Close()
+}
+
+func updateTimeStampCreateCallback (scope *gorm.Scope) {
+	if !scope.HasError() {
+		nowTime := time.Now().Unix()
+		if createTimeField, ok := scope.FieldByName("CreatedOn"); ok {
+			if createTimeField.IsBlank {
+				createTimeField.Set(nowTime)
+			}
+		}
+		if updateTimeField, ok := scope.FieldByName("UpdatedOn"); ok {
+			if updateTimeField.IsBlank {
+				updateTimeField.Set(nowTime)
+			}
+		}
+	}
+}
+
+func updateTimeStampForUpdateCallback (scope *gorm.Scope) {
+	if _, ok := scope.Get("gorm:update_column"); !ok {
+		scope.SetColumn("ModifiedOn", time.Now().Unix())
+	}
 }

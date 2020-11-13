@@ -1,0 +1,119 @@
+definitions:
+  gin.H:
+    additionalProperties: true
+    type: object
+host: 127.0.0.1:8088
+info:
+  contact:
+    name: API Support
+    url: http://www.swagger.io/support
+  description: docker监控服务后端API接口文档
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Docker监控服务
+  version: "1.0"
+paths:
+  /auth:
+    get:
+      parameters:
+      - description: USERNAME
+        in: path
+        name: username
+        required: true
+        type: string
+      - description: PASSWORD
+        in: path
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Get token
+  /v1/tags/{id}:
+    get:
+      parameters:
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: State
+        in: body
+        name: state
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: get article tag list
+    post:
+      parameters:
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: State
+        in: body
+        name: state
+        schema:
+          type: integer
+      - description: ModifiedBy
+        in: body
+        name: modified_by
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: add article tag
+    put:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Name
+        in: body
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: State
+        in: body
+        name: state
+        schema:
+          type: integer
+      - description: ModifiedBy
+        in: body
+        name: modified_by
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/gin.H'
+      summary: Update article tag
+swagger: "2.0"

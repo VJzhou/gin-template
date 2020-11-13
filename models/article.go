@@ -74,3 +74,8 @@ func EditArticle (id int, update map[string]interface{}) bool {
 func DeleteArticle (id int) {
 	db.Where("id = ?", id).Delete(Article{})
 }
+
+func CleanAllArticle () bool{
+	db.Unscoped().Where("stata = ?", 0).Delete(&Article{})
+	return true
+}

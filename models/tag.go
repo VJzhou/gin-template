@@ -1,10 +1,5 @@
 package models
 
-import (
-	"github.com/jinzhu/gorm"
-	"time"
-)
-
 type Tag struct {
 	Model // 内嵌类型
 
@@ -64,17 +59,24 @@ func ExistTagById(id int) bool {
 	}
 }
 
-func (tag *Tag) BeforeCreate(scope *gorm.Scope) error  {
-	scope.SetColumn("CreatedOn", time.Now().Unix())
-	return nil
-}
-
-
-func (tag *Tag) BeforeUpdate(scope *gorm.Scope) error  {
-	scope.SetColumn("ModifiedOn", time.Now().Unix())
-	return nil
-}
+//func (tag *Tag) BeforeCreate(scope *gorm.Scope) error  {
+//	scope.SetColumn("CreatedOn", time.Now().Unix())
+//	return nil
+//}
+//
+//
+//func (tag *Tag) BeforeUpdate(scope *gorm.Scope) error  {
+//	scope.SetColumn("ModifiedOn", time.Now().Unix())
+//	return nil
+//}
 
 func DeleteTag (tag *Tag) {
 	db.Delete(tag)
 }
+
+func CleanAllTag() bool {
+	db.Unscoped().Where("state = ?", 0).Delete(&Tag{})
+	return true
+}
+
+

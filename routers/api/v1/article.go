@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"github.com/unknwon/com"
-	"log"
+	"gin-demo/pkg/logging"
 )
 
 func GetArticle (context *gin.Context ) {
@@ -29,7 +29,7 @@ func GetArticle (context *gin.Context ) {
 		}
 	} else {
 		for _, err := range valid.Errors {
-			log.Printf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.Info("err.key: %s, err.message: %s", err.Key, err.Message)
 		}
 	}
 
@@ -70,7 +70,7 @@ func GetArticles (context *gin.Context ) {
 
 	} else {
 		for _, err := range valid.Errors {
-			log.Printf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.Info("err.key: %s, err.message: %s", err.Key, err.Message)
 		}
 	}
 
@@ -115,7 +115,7 @@ func AddArticle (context *gin.Context ) {
 		}
 	} else {
 		for _, err := range valid.Errors {
-			log.Printf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.Info("err.key: %s, err.message: %s", err.Key, err.Message)
 		}
 	}
 
@@ -180,7 +180,7 @@ func EditArticle (context *gin.Context ) {
 		}
 	} else {
 		for _, err := range valid.Errors {
-			log.Printf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.Info("err.key: %s, err.message: %s", err.Key, err.Message)
 		}
 	}
 
@@ -207,7 +207,7 @@ func DeleteArticle (context *gin.Context ) {
 		}
 	} else {
 		for _, err := range valid.Errors {
-			log.Printf("err.key: %s, err.message: %s", err.Key, err.Message)
+			logging.Info("err.key: %s, err.message: %s", err.Key, err.Message)
 		}
 	}
 
@@ -217,3 +217,5 @@ func DeleteArticle (context *gin.Context ) {
 		"data" : make(map[string]string),
 	})
 }
+
+
