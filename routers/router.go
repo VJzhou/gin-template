@@ -3,24 +3,28 @@ package routers
 import (
 	"gin-demo/middleware/jwt"
 	"gin-demo/pkg/setting"
+	"gin-demo/pkg/upload"
 	"gin-demo/routers/api"
 	v1 "gin-demo/routers/api/v1"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	_ "github.com/swaggo/gin-swagger/example/basic/docs"
+	"net/http"
 )
 
 func InitRouter() *gin.Engine {
 	route := gin.New()
 
+	route.StaticFS("upload/images", http.Dir(upload.GetImageFullPath()))
 	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	route.POST("/upload", api.UploadImage)
 
 	route.Use(gin.Logger())
 
 	route.Use(gin.Recovery())
 
-	gin.SetMode(setting.RunMode)
+	gin.SetMode(setting.ServerConfig.RunMode)
 
 	//route.GET("/test", func(context *gin.Context) {
 	//	context.JSON(200, gin.H{

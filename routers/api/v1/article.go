@@ -65,7 +65,7 @@ func GetArticles (context *gin.Context ) {
 	if ! valid.HasErrors() {
 		code = e.SUCCESS
 
-		data["lists"] = models.GetArticleList(util.GetPage(context), int(setting.PageSize), maps)
+		data["lists"] = models.GetArticleList(util.GetPage(context), int(setting.AppConfig.PageSize), maps)
 		data["total"] = models.GetArticleCount(maps)
 
 	} else {
@@ -88,6 +88,7 @@ func AddArticle (context *gin.Context ) {
 	content := context.Query("content")
 	createdBy := context.Query("created_by")
 	state := com.StrTo(context.DefaultQuery("state", "0")).MustInt()
+	image := context.Query("image")
 
 	valid := validation.Validation{}
 	valid.Min(tagId, 1, "tag_id").Message("标签ID必须大于0")
@@ -107,6 +108,7 @@ func AddArticle (context *gin.Context ) {
 			data["content"] = content
 			data["created_by"] = createdBy
 			data["state"] = int8(state)
+			data["image"] = image
 
 			models.AddArticle(data)
 			code = e.SUCCESS
@@ -135,6 +137,7 @@ func EditArticle (context *gin.Context ) {
 	desc := context.Query("desc")
 	content := context.Query("content")
 	modifiedBy := context.Query("modified_by")
+	image := context.Query("image")
 
 	var state int = -1
 	if arg := context.Query("state"); arg != "" {
@@ -166,6 +169,10 @@ func EditArticle (context *gin.Context ) {
 				}
 				if content != "" {
 					data["content"] = content
+				}
+
+				if image != "" {
+					data["cover_image_url"] = image
 				}
 
 				data["modified_by"] = modifiedBy

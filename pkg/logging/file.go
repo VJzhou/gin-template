@@ -2,42 +2,61 @@ package logging
 
 import (
 	"fmt"
-	"log"
+	"gin-demo/pkg/file"
+	"gin-demo/pkg/setting"
 	"os"
 	"time"
 )
 
 var (
-	LogSavePath = "runtime/logs/"
-	LogSaveName = "log"
-	LogFileExt = ".log"
-	TimeFormat = "20060102"
+	LogSavePath,
+	LogSaveName,
+	LogFileExt,
+	TimeFormat string
 )
 
+func init () {
+	LogSavePath = setting.AppConfig.LogSavePath
+	LogSaveName = setting.AppConfig.LogSaveName
+	LogFileExt = setting.AppConfig.LogFileExt
+	TimeFormat = setting.AppConfig.TimeFormat
+}
+
+
 func getLogFilePath () string {
-	return fmt.Sprintf("%s", LogSavePath)
+	return fmt.Sprintf("%s%s", setting.AppConfig.RuntimeRootPath, setting.AppConfig.LogSavePath)
 }
 
-func getLogFileFullPath () string {
-	prefixPath := getLogFilePath()
-	filename := fmt.Sprintf("%s%s%s", LogSaveName, time.Now().Format(TimeFormat), LogFileExt)
-	return fmt.Sprintf("%s%s", prefixPath, filename)
+func getLogFileName () string {
+	return fmt.Sprintf("%s%s.%s",
+		setting.AppConfig.LogSaveName,
+		time.Now().Format(setting.AppConfig.TimeFormat),
+		setting.AppConfig.LogFileExt,
+	)
 }
 
-func openLogFile(filePath string) *os.File {
-	_, err := os.Stat(filePath)
-	switch  {
-	case os.IsNotExist(err):
-		mkDir()
-	case os.IsPermission(err):
-		log.Fatalf("Permission: %v", err)
-	}
+func openLogFile(filename, filePath string) (*os.File, error) {
 
-	handle, err := os.OpenFile(filePath, os.O_APPEND | os.O_CREATE | os.O_WRONLY, 0644)
+	dir, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("Fail to Openfile %v", err)
+		return nil, fmt.Errorf("os.Getwd err: %v", err)
 	}
-	return handle
+
+	src := dir + "/" + filePath
+	perm := file.CheckPermission(src)
+	if perm == true {
+		return nil, fmt.Errorf("file.CheckPermission Permission denied src: %s", src)
+	}
+	err = file.IsNotExistMkDir(src)
+	if err != nil {
+		return nil, fmt.Errorf("file.IsNotExistMkDir src: %s , err: %v", src, err)
+	}
+
+	f, err := file.Open(src + filename, os.O_APPEND | os.O_CREATE | os.O_WRONLY, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("Fail to OpenFile: %v", err)
+	}
+	return f, nil
 }
 
 func mkDir() {
