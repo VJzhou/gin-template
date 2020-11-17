@@ -3,6 +3,9 @@ package main
 import (
   "context"
   "fmt"
+  "gin-demo/models"
+  "gin-demo/pkg/gredis"
+  "gin-demo/pkg/logging"
   "gin-demo/pkg/setting"
   "gin-demo/routers"
   "log"
@@ -40,14 +43,19 @@ func main() {
   //  log.Printf("Server err: %v", err)
   //}
 
-
+  setting.Setup()
+  models.Setup()
+  logging.Setup()
+  if err := gredis.Setup(); err != nil {
+    logging.Error(err)
+  }
   // http shutdown
   router := routers.InitRouter()
   server := &http.Server{
-     Addr: fmt.Sprintf(":%d", setting.HTTPPort),
+     Addr: fmt.Sprintf(":%d", setting.ServerConfig.HttpPort),
      Handler: router,
-     ReadTimeout: setting.ReadTimeout,
-     WriteTimeout: setting.WriteTimeout,
+     ReadTimeout: setting.ServerConfig.ReadTimeout,
+     WriteTimeout: setting.ServerConfig.WriteTimeout,
      MaxHeaderBytes: 1 << 20,
   }
 
