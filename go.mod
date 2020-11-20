@@ -20,7 +20,7 @@ require (
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/robfig/cron v1.2.0 // indirect
+	github.com/robfig/cron v1.2.0
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shiena/ansicolor v0.0.0-20200904210342-c7312218db18 // indirect

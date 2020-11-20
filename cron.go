@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func main() {
+func main1() {
 	log.Println("Crontab Starting......")
 
 	c := cron.New() // 创建空白Cron job runner
