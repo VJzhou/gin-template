@@ -1,16 +1,14 @@
 package util
 
-import (
-	"github.com/gin-gonic/gin"
-	"github.com/unknwon/com"
-	"gin-demo/pkg/setting"
-)
+type Page struct {
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
+}
 
-func GetPage(c *gin.Context) int{
-	result := 0
-	page, _:= com.StrTo(c.Query("page")).Int()
-	if page > 0 {
-		result = (page - 1) * int(setting.AppConfig.PageSize)
-	}
-	return result
+func (p Page) GetOffset() int {
+	return (p.Page - 1) * p.Limit
+}
+
+func (p Page) GetPage() int {
+	return p.Page
 }
