@@ -1,30 +1,29 @@
 package main
 
 import (
-	"gin-demo/models"
 	"github.com/robfig/cron"
 	"log"
 	"time"
 )
 
-func main1() {
+func main() {
 	log.Println("Crontab Starting......")
 
 	c := cron.New() // 创建空白Cron job runner
 
 	c.AddFunc("* * * * * *", func() {
 		log.Println("Run models.CleanAllTag")
-		models.CleanAllTag()
+		//models.CleanAllTag()
 	})
 
 	c.AddFunc("* * * * * *", func() {
 		log.Println("Run models.CleanAllArticle")
-		models.CleanAllArticle()
+		//models.CleanAllArticle()
 	})
 
 	c.Start()
 
-	t1 := time.NewTimer(time.Second * 10 )
+	t1 := time.NewTimer(time.Second * 10)
 	for {
 		select {
 		case <-t1.C:

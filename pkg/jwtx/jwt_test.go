@@ -72,3 +72,5 @@ func TestParseToken(t *testing.T) {
 	t.Log(claimsObj.UID)
 	t.Log(claimsObj.Email)
 }
+
+// TODO Refresh Token not test
