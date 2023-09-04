@@ -22,15 +22,15 @@ WriteTimeout = 60
 
 [database]
 Drive = mysql
-User = root
-Password = 123456
-Host = mysql:3306
-Name = gin
-TablePrefix = blog_
+User =
+Password =
+Host =
+Name =
+TablePrefix =
 
 [redis]
-Host = redis:6379
+Host =
 Password =
-MaxIdle = 30
-MaxActive = 30
-IdleTimeout = 200
+MaxIdle =
+MaxActive =
+IdleTimeout =

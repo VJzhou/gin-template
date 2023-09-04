@@ -5,11 +5,11 @@ Server:
   WriteTimeout: 60s
 
 Mysql:
-  User: root
-  Password: 123456
-  Host: 106.12.109.215:3306
-  DBName: mypay
-  TablePrefix: commerce_
+  User:
+  Password:
+  Host:
+  DBName:
+  TablePrefix:
   Charset: utf8mb4
   ParseTime: True
   MaxIdleConns: 10
