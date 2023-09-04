@@ -8,6 +8,7 @@ type ViperX struct {
 	vp *viper.Viper
 }
 
+// TODO Modified
 func NewViperX() (*ViperX, error) {
 	vp := viper.New()
 	vp.SetConfigName("config") // 设置配置文件名称
