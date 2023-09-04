@@ -2,8 +2,8 @@ package logging
 
 import (
 	"fmt"
+	"gin-demo/conf"
 	"gin-demo/pkg/file"
-	"gin-demo/pkg/setting"
 	"os"
 	"time"
 )
@@ -15,23 +15,22 @@ var (
 	TimeFormat string
 )
 
-func init () {
-	LogSavePath = setting.AppConfig.LogSavePath
-	LogSaveName = setting.AppConfig.LogSaveName
-	LogFileExt = setting.AppConfig.LogFileExt
-	TimeFormat = setting.AppConfig.TimeFormat
+func init() {
+	LogSavePath = conf.AppConfig.LogSavePath
+	LogSaveName = conf.AppConfig.LogSaveName
+	LogFileExt = conf.AppConfig.LogFileExt
+	TimeFormat = conf.AppConfig.TimeFormat
 }
 
-
-func getLogFilePath () string {
-	return fmt.Sprintf("%s%s", setting.AppConfig.RuntimeRootPath, setting.AppConfig.LogSavePath)
+func getLogFilePath() string {
+	return fmt.Sprintf("%s%s", conf.AppConfig.RuntimeRootPath, conf.AppConfig.LogSavePath)
 }
 
-func getLogFileName () string {
+func getLogFileName() string {
 	return fmt.Sprintf("%s%s.%s",
-		setting.AppConfig.LogSaveName,
-		time.Now().Format(setting.AppConfig.TimeFormat),
-		setting.AppConfig.LogFileExt,
+		conf.AppConfig.LogSaveName,
+		time.Now().Format(conf.AppConfig.TimeFormat),
+		conf.AppConfig.LogFileExt,
 	)
 }
 
@@ -52,7 +51,7 @@ func openLogFile(filename, filePath string) (*os.File, error) {
 		return nil, fmt.Errorf("file.IsNotExistMkDir src: %s , err: %v", src, err)
 	}
 
-	f, err := file.Open(src + filename, os.O_APPEND | os.O_CREATE | os.O_WRONLY, 0644)
+	f, err := file.Open(src+filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("Fail to OpenFile: %v", err)
 	}
@@ -60,10 +59,9 @@ func openLogFile(filename, filePath string) (*os.File, error) {
 }
 
 func mkDir() {
-	dir, _ := os.Getwd();
-	err := os.MkdirAll(dir + "/" + getLogFilePath(), os.ModePerm)
+	dir, _ := os.Getwd()
+	err := os.MkdirAll(dir+"/"+getLogFilePath(), os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
 }
-

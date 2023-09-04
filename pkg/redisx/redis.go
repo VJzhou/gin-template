@@ -2,7 +2,7 @@ package redisx
 
 import (
 	"encoding/json"
-	"gin-demo/pkg/setting"
+	"gin-demo/conf"
 	"github.com/gomodule/redigo/redis"
 	"time"
 )
@@ -11,16 +11,16 @@ var Conn *redis.Pool
 
 func Setup() error {
 	Conn = &redis.Pool{
-		MaxIdle:     setting.RedisConfig.MaxIdle,
-		MaxActive:   setting.RedisConfig.MaxActive,
-		IdleTimeout: setting.RedisConfig.IdleTimeout,
+		MaxIdle:     conf.RedisConfig.MaxIdle,
+		MaxActive:   conf.RedisConfig.MaxActive,
+		IdleTimeout: conf.RedisConfig.IdleTimeout,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", setting.RedisConfig.Host)
+			c, err := redis.Dial("tcp", conf.RedisConfig.Host)
 			if err != nil {
 				return nil, err
 			}
-			if setting.RedisConfig.Password != "" {
-				if _, err := c.Do("AUTH", setting.RedisConfig.Password); err != nil {
+			if conf.RedisConfig.Password != "" {
+				if _, err := c.Do("AUTH", conf.RedisConfig.Password); err != nil {
 					c.Close()
 					return nil, err
 				}

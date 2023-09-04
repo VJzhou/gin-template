@@ -1,8 +1,8 @@
 package routers
 
 import (
+	"gin-demo/conf"
 	"gin-demo/middleware/jwt"
-	"gin-demo/pkg/setting"
 	"gin-demo/pkg/upload"
 	"gin-demo/routers/api"
 	"github.com/gin-gonic/gin"
@@ -23,7 +23,7 @@ func InitRouter() *gin.Engine {
 
 	route.Use(gin.Recovery())
 
-	gin.SetMode(setting.ServerConfig.RunMode)
+	gin.SetMode(conf.ServerConfig.RunMode)
 
 	// 注册路由
 	v1Api := route.Group("/v1")

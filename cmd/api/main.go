@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"gin-demo/conf"
 	"gin-demo/models"
 	"gin-demo/pkg/logging"
 	"gin-demo/pkg/redisx"
-	"gin-demo/pkg/setting"
 	"gin-demo/routers"
 	"log"
 	"net/http"
@@ -43,7 +43,7 @@ func main() {
 	//  log.Printf("Server err: %v", err)
 	//}
 
-	setting.Setup()
+	conf.Setup()
 	models.Setup()
 	logging.Setup()
 	if err := redisx.Setup(); err != nil {
@@ -52,10 +52,10 @@ func main() {
 	// http shutdown
 	router := routers.InitRouter()
 	server := &http.Server{
-		Addr:           fmt.Sprintf(":%d", setting.ServerConfig.HttpPort),
+		Addr:           fmt.Sprintf(":%d", conf.ServerConfig.HttpPort),
 		Handler:        router,
-		ReadTimeout:    setting.ServerConfig.ReadTimeout,
-		WriteTimeout:   setting.ServerConfig.WriteTimeout,
+		ReadTimeout:    conf.ServerConfig.ReadTimeout,
+		WriteTimeout:   conf.ServerConfig.WriteTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
 

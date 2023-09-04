@@ -1,4 +1,4 @@
-package setting
+package conf
 
 import (
 	"github.com/go-ini/ini"
@@ -7,45 +7,48 @@ import (
 )
 
 type App struct {
-	JwtSecret string
-	PageSize int
+	JwtSecret       string
+	PageSize        int
 	RuntimeRootPath string
 
 	ImagePrefixPath string
-	ImageSavePath string
-	ImagaMaxSize int
-	ImageAllowExts []string
+	ImageSavePath   string
+	ImagaMaxSize    int
+	ImageAllowExts  []string
 
 	LogSavePath string
 	LogSaveName string
-	LogFileExt string
-	TimeFormat string
+	LogFileExt  string
+	TimeFormat  string
 }
+
 var AppConfig = &App{}
 
 type Server struct {
-	RunMode string
-	HttpPort int
-	ReadTimeout time.Duration
+	RunMode      string
+	HttpPort     int
+	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 }
+
 var ServerConfig = &Server{}
 
 type DataBase struct {
-	Drive string
-	User string
-	Password string
-	Host string
-	Name string
+	Drive       string
+	User        string
+	Password    string
+	Host        string
+	Name        string
 	TablePrefix string
 }
+
 var DatabaseConfig = &DataBase{}
 
 type Redis struct {
-	Host string
-	Password string
-	MaxIdle int
-	MaxActive int
+	Host        string
+	Password    string
+	MaxIdle     int
+	MaxActive   int
 	IdleTimeout time.Duration
 }
 
@@ -77,8 +80,6 @@ func Setup() {
 		log.Fatalf("config.mapto RedisSetting err: %v", err)
 	}
 }
-
-
 
 //
 //
@@ -135,4 +136,3 @@ func Setup() {
 //	JwtSecret = section.Key("JWT_SECRET").MustString("!@)*#)!@U#@*!@!)")
 //	PageSize = int8(section.Key("PAGE_SIZE").MustInt(10))
 //}
-
