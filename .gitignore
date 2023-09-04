@@ -1,4 +1,4 @@
 .idea/*
-./conf/*.ini
-./conf/*.yaml
+*.ini
+*.yaml
 runtime/*
