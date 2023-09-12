@@ -20,3 +20,9 @@ type MysqlConfig struct {
 	MaxIdleConns int
 	MaxOpenConns int
 }
+
+type RedisConfig struct {
+	Host     string
+	Password string
+	DB       int
+}

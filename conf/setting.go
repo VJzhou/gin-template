@@ -52,7 +52,7 @@ type Redis struct {
 	IdleTimeout time.Duration
 }
 
-var RedisConfig = &Redis{}
+var RedisConfig1 = &Redis{}
 
 func Setup() {
 	config, err := ini.Load("conf/app.ini")
@@ -75,7 +75,7 @@ func Setup() {
 		log.Fatalf("config.mapto DatabaseSetting err: %v", err)
 	}
 
-	err = config.Section("redis").MapTo(RedisConfig)
+	err = config.Section("redis").MapTo(RedisConfig1)
 	if err != nil {
 		log.Fatalf("config.mapto RedisSetting err: %v", err)
 	}

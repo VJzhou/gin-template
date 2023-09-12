@@ -18,7 +18,7 @@ func NewViperX() (*ViperX, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ViperX{}, nil
+	return &ViperX{vp}, nil
 }
 
 func (s *ViperX) ReadSection(key string, v interface{}) error {

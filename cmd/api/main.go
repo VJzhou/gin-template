@@ -4,15 +4,9 @@ import (
 	"context"
 	"fmt"
 	"gin-demo/conf"
-	"gin-demo/models"
-	"gin-demo/pkg/logging"
-	"gin-demo/pkg/redisx"
-	"gin-demo/routers"
+	"gin-demo/pkg/configx"
+	"github.com/redis/go-redis/v9"
 	"log"
-	"net/http"
-	"os"
-	"os/signal"
-	"time"
 )
 
 // @title Docker监控服务
@@ -43,38 +37,73 @@ func main() {
 	//  log.Printf("Server err: %v", err)
 	//}
 
-	conf.Setup()
-	models.Setup()
-	logging.Setup()
-	if err := redisx.Setup(); err != nil {
-		logging.Error(err)
-	}
-	// http shutdown
-	router := routers.InitRouter()
-	server := &http.Server{
-		Addr:           fmt.Sprintf(":%d", conf.ServerConfig.HttpPort),
-		Handler:        router,
-		ReadTimeout:    conf.ServerConfig.ReadTimeout,
-		WriteTimeout:   conf.ServerConfig.WriteTimeout,
-		MaxHeaderBytes: 1 << 20,
+	//conf.Setup()
+	err := initConfig()
+	if err != nil {
+		log.Fatalln(err.Error())
 	}
 
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			log.Printf("Listen: %s\n", err)
-		}
-	}()
-
-	quit := make(chan os.Signal)
-	signal.Notify(quit, os.Interrupt)
-	<-quit
-
-	log.Println("Shutdown Server")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
-	}
+	//logging.Setup()
+	//
+	//// http shutdown
+	//router := routers.InitRouter()
+	//server := &http.Server{
+	//	Addr:           fmt.Sprintf(":%d", conf.ServerConfig.HttpPort),
+	//	Handler:        router,
+	//	ReadTimeout:    conf.ServerConfig.ReadTimeout,
+	//	WriteTimeout:   conf.ServerConfig.WriteTimeout,
+	//	MaxHeaderBytes: 1 << 20,
+	//}
+	//
+	//go func() {
+	//	if err := server.ListenAndServe(); err != nil {
+	//		log.Printf("Listen: %s\n", err)
+	//	}
+	//}()
+	//
+	//quit := make(chan os.Signal)
+	//signal.Notify(quit, os.Interrupt)
+	//<-quit
+	//
+	//log.Println("Shutdown Server")
+	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	//defer cancel()
+	//if err := server.Shutdown(ctx); err != nil {
+	//	log.Fatal("Server Shutdown:", err)
+	//}
 
 	log.Println("Server exiting")
+}
+
+func initConfig() error {
+	viperx, err := configx.NewViperX()
+	if err != nil {
+		return fmt.Errorf("new config instance failed %w", err)
+	}
+
+	// read mysql config
+	var mysqlConfig conf.MysqlConfig
+	err = viperx.ReadSection("Mysql", &mysqlConfig)
+	if err != nil {
+		return err
+	}
+
+	// read redis config
+	var redisConfig conf.RedisConfig
+	err = viperx.ReadSection("Redis", &redisConfig)
+	if err != nil {
+		return err
+	}
+
+	client := redis.NewClient(&redis.Options{
+		Addr:     redisConfig.Host,
+		Password: redisConfig.Password,
+		DB:       redisConfig.DB,
+	})
+
+	err = client.Set(context.Background(), "xx", 1, 0).Err()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return nil
 }

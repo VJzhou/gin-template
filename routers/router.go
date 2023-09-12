@@ -2,9 +2,8 @@ package routers
 
 import (
 	"gin-demo/conf"
-	"gin-demo/middleware/jwt"
+	"gin-demo/pkg/app"
 	"gin-demo/pkg/upload"
-	"gin-demo/routers/api"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -17,7 +16,7 @@ func InitRouter() *gin.Engine {
 
 	route.StaticFS("upload/images", http.Dir(upload.GetImageFullPath()))
 	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	route.POST("/upload", api.UploadImage)
+	//route.POST("/upload", api.UploadImage)
 
 	route.Use(gin.Logger())
 
@@ -27,7 +26,14 @@ func InitRouter() *gin.Engine {
 
 	// 注册路由
 	v1Api := route.Group("/v1")
-	v1Api.Use(jwt.JWT())
+
+	v1Api.GET("/name", func(c *gin.Context) {
+		c.JSON(http.StatusOK, app.Response{
+			Code: 1,
+			Msg:  "asdasdasd",
+		})
+	})
+	//v1Api.Use(jwt.JWT())
 
 	return route
 }
