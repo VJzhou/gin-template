@@ -14,4 +14,3 @@ Mysql:
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
-

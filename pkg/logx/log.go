@@ -1,4 +1,4 @@
-package logging
+package logx
 
 import (
 	"fmt"
@@ -8,16 +8,18 @@ import (
 	"runtime"
 )
 
+//https://juejin.cn/post/7119390985863299085
+
 type Level int
 
 var (
 	F *os.File
 
-	DefaultPrefix = ""
+	DefaultPrefix      = ""
 	DefaultCallerDepth = 2
 
-	logger *log.Logger
-	logPrefix = ""
+	logger     *log.Logger
+	logPrefix  = ""
 	levelFlags = []string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
 )
 
@@ -36,7 +38,7 @@ func Setup() {
 	fmt.Println(filename)
 	fmt.Println(filePath)
 	F, err = openLogFile(filename, filePath)
-	if err != nil{
+	if err != nil {
 		log.Fatalln(err)
 	}
 	logger = log.New(F, DefaultPrefix, log.LstdFlags)

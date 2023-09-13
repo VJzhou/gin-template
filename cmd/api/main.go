@@ -5,6 +5,7 @@ import (
 	"gin-demo/pkg/configx"
 	"gin-demo/pkg/mysqlx"
 	"gin-demo/pkg/redisx"
+	"go.uber.org/zap"
 	"log"
 )
 
@@ -53,6 +54,11 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
+	//logger := zap.Must(zap.NewProduction())
+	logger := zap.Must(zap.NewDevelopment())
+	defer logger.Sync()
+
+	logger.Info("haha")
 	//logging.Setup()
 	//
 	//// http shutdown
