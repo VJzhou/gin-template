@@ -1,11 +1,10 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"gin-demo/conf"
 	"gin-demo/pkg/configx"
-	"github.com/redis/go-redis/v9"
+	"gin-demo/pkg/mysqlx"
+	"gin-demo/pkg/redisx"
 	"log"
 )
 
@@ -37,8 +36,19 @@ func main() {
 	//  log.Printf("Server err: %v", err)
 	//}
 
-	//conf.Setup()
-	err := initConfig()
+	config, err := initConfig()
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	mysqlConfig, _ := config.GetMysqlConfig()
+	log.Println("mysql config", mysqlConfig)
+
+	err = initMysql(config)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	err = initRedis(config)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -75,35 +85,31 @@ func main() {
 	log.Println("Server exiting")
 }
 
-func initConfig() error {
+func initConfig() (*configx.ConfigX, error) {
 	viperx, err := configx.NewViperX()
 	if err != nil {
-		return fmt.Errorf("new config instance failed %w", err)
+		return nil, fmt.Errorf("new config instance failed %w", err)
 	}
 
-	// read mysql config
-	var mysqlConfig conf.MysqlConfig
-	err = viperx.ReadSection("Mysql", &mysqlConfig)
+	config := &configx.ConfigX{
+		Driver: viperx,
+	}
+
+	return config, err
+}
+
+func initMysql(config *configx.ConfigX) error {
+	mysqlConfig, err := config.GetMysqlConfig()
 	if err != nil {
 		return err
 	}
+	return mysqlx.New(mysqlConfig)
+}
 
-	// read redis config
-	var redisConfig conf.RedisConfig
-	err = viperx.ReadSection("Redis", &redisConfig)
+func initRedis(config *configx.ConfigX) error {
+	redisConfig, err := config.GetRedisConfig()
 	if err != nil {
 		return err
 	}
-
-	client := redis.NewClient(&redis.Options{
-		Addr:     redisConfig.Host,
-		Password: redisConfig.Password,
-		DB:       redisConfig.DB,
-	})
-
-	err = client.Set(context.Background(), "xx", 1, 0).Err()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	return nil
+	return redisx.New(redisConfig)
 }
