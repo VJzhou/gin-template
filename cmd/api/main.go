@@ -6,7 +6,9 @@ import (
 	"gin-demo/pkg/mysqlx"
 	"gin-demo/pkg/redisx"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"log"
+	"time"
 )
 
 // @title Docker监控服务
@@ -37,6 +39,29 @@ func main() {
 	//  log.Printf("Server err: %v", err)
 	//}
 
+	conf := zap.NewProductionConfig()
+
+	conf.Encoding = "console"
+
+	format := "[%s]"
+
+	conf.EncoderConfig.EncodeTime = func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(fmt.Sprintf(format, t.Format("2006-01-02 15:04:05")))
+	}
+
+	conf.EncoderConfig.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(fmt.Sprintf(format, caller.TrimmedPath()))
+	}
+
+	conf.EncoderConfig.EncodeLevel = func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(fmt.Sprintf(format, level.String()))
+	}
+
+	logger, _ := conf.Build()
+	logger.Info("service start")
+
+	logger.Info("info msg", zap.String("haha", "name"), zap.Int("age", 18), zap.Duration("timer", time.Minute))
+
 	config, err := initConfig()
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -54,11 +79,6 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	//logger := zap.Must(zap.NewProduction())
-	logger := zap.Must(zap.NewDevelopment())
-	defer logger.Sync()
-
-	logger.Info("haha")
 	//logging.Setup()
 	//
 	//// http shutdown
