@@ -1,10 +1,13 @@
 package logx
 
-import "testing"
+import (
+	"gin-demo/pkg/logx/zapx"
+	"testing"
+)
 
 func TestNewLogger(t *testing.T) {
 
-	config := &Config{
+	config := &zapx.Config{
 		Path:    "../../logs/fly.log",
 		Encoder: ConsoleEncoder,
 	}
@@ -24,7 +27,7 @@ func TestNewLogger(t *testing.T) {
 
 func TestFatalf(t *testing.T) {
 
-	config := &Config{
+	config := &zapx.Config{
 		Path:    "../../logs/fly.log",
 		Encoder: JsonEncoder,
 	}
