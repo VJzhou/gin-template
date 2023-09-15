@@ -13,10 +13,10 @@ import (
 
 type (
 	Config struct {
-		Path     string
-		Encoder  string
-		Filename string
-		Level    zap.LevelEnablerFunc
+		Path    string
+		Encoder string
+		//Filename string
+		//Level    zap.LevelEnablerFunc
 	}
 
 	Encoder interface {
@@ -47,6 +47,11 @@ var (
 	JsonEncoder    = "Json"
 )
 
+type LogFile struct {
+	Filename string
+	Level    zap.LevelEnablerFunc
+}
+
 func Init(conf *Config) {
 	config = conf
 
@@ -58,10 +63,18 @@ func Init(conf *Config) {
 	log.Println("infoPath:", infoPath, "errPath:", errPath)
 
 	//items := []
-	NewLogger()
+	logFiles := []LogFile{
+		{Filename: infoPath, Level: func(level zapcore.Level) bool {
+			return level <= zap.InfoLevel
+		}},
+		{Filename: errPath, Level: func(level zapcore.Level) bool {
+			return level > zap.InfoLevel
+		}},
+	}
+	NewLogger(logFiles)
 }
 
-func NewLogger() {
+func NewLogger(logFiles []LogFile) {
 	var encoder zapcore.Encoder
 	var cores []zapcore.Core
 
@@ -74,21 +87,22 @@ func NewLogger() {
 		encoder = NewConsoleFormatter().Config()
 	}
 
-	writer := &lumberjack.Logger{
-		Filename:   v.FileName,
-		MaxSize:    maxSize,    // 每个日志文件保存的最大尺寸 单位：M
-		MaxBackups: maxBackups, // 日志文件最多保存多少个备份
-		MaxAge:     maxAge,     // 文件最多保存多少天
-		Compress:   true,       // 是否压缩
-		LocalTime:  true,       // 备份文件名本地/UTC时间
+	for _, v := range logFiles {
+		writer := &lumberjack.Logger{
+			Filename:   v.Filename,
+			MaxSize:    maxSize,    // 每个日志文件保存的最大尺寸 单位：M
+			MaxBackups: maxBackups, // 日志文件最多保存多少个备份
+			MaxAge:     maxAge,     // 文件最多保存多少天
+			Compress:   true,       // 是否压缩
+			LocalTime:  true,       // 备份文件名本地/UTC时间
+		}
+		core := zapcore.NewCore(
+			encoder, // 编码器配置;
+			zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(writer)), // 打印到控制台和文件
+			v.Level, // 日志级别
+		)
+		cores = append(cores, core)
 	}
-	core := zapcore.NewCore(
-		encoder,                                                                          // 编码器配置;
-		zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(writer)), // 打印到控制台和文件
-		v.Level,                                                                          // 日志级别
-	)
-	cores = append(cores, core)
-
 	zapLogger = zap.New(zapcore.NewTee(cores...), zap.AddCaller(), zap.Development(), zap.AddCallerSkip(1))
 	return
 }

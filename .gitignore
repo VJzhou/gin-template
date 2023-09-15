@@ -2,3 +2,5 @@
 conf/*.ini
 conf/*.yaml
 runtime/*
+logs/
+log/

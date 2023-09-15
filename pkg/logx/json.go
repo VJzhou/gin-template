@@ -28,7 +28,7 @@ func (formater *JsonFormatter) Config() zapcore.Encoder {
 	}
 
 	config.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(getFilePath(caller))
+		encoder.AppendString(getFilePath(&caller))
 	}
 
 	config.EncodeLevel = func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
