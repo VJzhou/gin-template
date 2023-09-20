@@ -1,37 +1,41 @@
-package logx
+package zapx
 
 import (
-	"gin-demo/pkg/logx/zapx"
+	"gin-demo/pkg/logx"
 	"testing"
 )
 
 func TestNewLogger(t *testing.T) {
+	config := getConfig(consoleEncoder)
+	zapLogger, _ := New(config)
 
-	config := &zapx.Config{
-		Path:    "../../logs/fly.log",
-		Encoder: ConsoleEncoder,
-	}
-
-	Init(config)
 	defer Sync()
-	Debug("debug msg")
-	Debugf("debugf %s", "fly")
-	Info("info msg")
-	Infof("infof %d", 10)
-	Warn("warn msg")
-	Warnf("warnf %v", true)
-	Error("err msg")
-	Errorf("errorf %v", []int{1, 2, 3})
-	Fatal("fatal msg")
+	logx.Debug("debug msg")
+	logx.Debugf("debugf %s", "fly")
+	logx.Info("info msg")
+	logx.Infof("infof %d", 10)
+	logx.Warn("warn msg")
+	logx.Warnf("warnf %v", true)
+	logx.Error("err msg")
+	logx.Errorf("errorf %v", []int{1, 2, 3})
+	logx.Fatal("fatal msg")
 }
 
 func TestFatalf(t *testing.T) {
 
-	config := &zapx.Config{
-		Path:    "../../logs/fly.log",
-		Encoder: JsonEncoder,
+	config := getConfig(consoleEncoder)
+	zapLogger, _ := New(config)
+
+	defer logx.Sync()
+	logx.Fatalf("fatalf %v", map[string]interface{}{"name": "master"})
+}
+
+func getConfig(encoder string) *Config {
+	return &Config{
+		FilePath:   "../../logs/fly.log",
+		Encoder:    encoder,
+		MaxSize:    200,
+		MaxBackups: 1,
+		MaxAge:     1,
 	}
-	Init(config)
-	defer Sync()
-	Fatalf("fatalf %v", map[string]interface{}{"name": "master"})
 }

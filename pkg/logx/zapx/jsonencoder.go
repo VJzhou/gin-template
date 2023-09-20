@@ -21,7 +21,7 @@ func NewJsonEncoder() *JsonEncoder {
 	}
 }
 
-func (formater *JsonEncoder) Config() zapcore.Encoder {
+func GetJsonZapCoreEncoder() zapcore.Encoder {
 	config := zap.NewProductionEncoderConfig()
 
 	config.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
@@ -29,7 +29,7 @@ func (formater *JsonEncoder) Config() zapcore.Encoder {
 	}
 
 	config.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(logx.getFilePath(&caller))
+		encoder.AppendString(getFilePath(&caller))
 	}
 
 	config.EncodeLevel = func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
@@ -39,52 +39,52 @@ func (formater *JsonEncoder) Config() zapcore.Encoder {
 	return zapcore.NewJSONEncoder(config)
 }
 
-func (jf *JsonEncoder) WithKey(key string) Encoder {
-	jf.val = jf.val + key + " "
-	return jf
+func (je *JsonEncoder) WithKey(key string) Encoder {
+	je.val = je.val + key + " "
+	return je
 }
 
-func (jf *JsonEncoder) WithField(key, val string) Encoder {
-	jf.fields = append(jf.fields, zap.String(key, val))
-	return jf
+func (je *JsonEncoder) WithField(key, val string) Encoder {
+	je.fields = append(je.fields, zap.String(key, val))
+	return je
 }
 
-func (jf *JsonEncoder) Debug(msg string) {
-	logx.zapLogger.Debug(jf.val+msg, jf.fields...)
+func (je *JsonEncoder) Debug(msg string) {
+	zapLogger.Debug(je.val+msg, je.fields...)
 }
 
-func (jf *JsonEncoder) Debugf(format string, v ...interface{}) {
-	logx.zapLogger.Debug(fmt.Sprintf(jf.val+format, v...), jf.fields...)
+func (je *JsonEncoder) Debugf(format string, v ...interface{}) {
+	logx.zapLogger.Debug(fmt.Sprintf(je.val+format, v...), je.fields...)
 }
 
-func (jf *JsonEncoder) Info(msg string) {
-	logx.zapLogger.Info(jf.val+msg, jf.fields...)
+func (je *JsonEncoder) Info(msg string) {
+	logx.zapLogger.Info(je.val+msg, je.fields...)
 }
 
-func (jf *JsonEncoder) Infof(format string, v ...interface{}) {
-	logx.zapLogger.Info(fmt.Sprintf(jf.val+format, v...), jf.fields...)
+func (je *JsonEncoder) Infof(format string, v ...interface{}) {
+	logx.zapLogger.Info(fmt.Sprintf(je.val+format, v...), je.fields...)
 }
 
-func (jf *JsonEncoder) Warn(msg string) {
-	logx.zapLogger.Warn(jf.val+msg, jf.fields...)
+func (je *JsonEncoder) Warn(msg string) {
+	logx.zapLogger.Warn(je.val+msg, je.fields...)
 }
 
-func (jf *JsonEncoder) Warnf(format string, v ...interface{}) {
-	logx.zapLogger.Warn(fmt.Sprintf(jf.val+format, v...), jf.fields...)
+func (je *JsonEncoder) Warnf(format string, v ...interface{}) {
+	logx.zapLogger.Warn(fmt.Sprintf(je.val+format, v...), je.fields...)
 }
 
-func (jf *JsonEncoder) Error(msg string) {
-	logx.zapLogger.Error(jf.val+msg, jf.fields...)
+func (je *JsonEncoder) Error(msg string) {
+	logx.zapLogger.Error(je.val+msg, je.fields...)
 }
 
-func (jf *JsonEncoder) Errorf(format string, v ...interface{}) {
-	logx.zapLogger.Error(fmt.Sprintf(jf.val+format, v...), jf.fields...)
+func (je *JsonEncoder) Errorf(format string, v ...interface{}) {
+	logx.zapLogger.Error(fmt.Sprintf(je.val+format, v...), je.fields...)
 }
 
-func (jf *JsonEncoder) Fatal(msg string) {
-	logx.zapLogger.Fatal(jf.val+msg, jf.fields...)
+func (je *JsonEncoder) Fatal(msg string) {
+	logx.zapLogger.Fatal(je.val+msg, je.fields...)
 }
 
-func (jf *JsonEncoder) Fatalf(format string, v ...interface{}) {
-	logx.zapLogger.Fatal(fmt.Sprintf(jf.val+format, v...), jf.fields...)
+func (je *JsonEncoder) Fatalf(format string, v ...interface{}) {
+	logx.zapLogger.Fatal(fmt.Sprintf(je.val+format, v...), je.fields...)
 }

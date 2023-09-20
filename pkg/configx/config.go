@@ -2,12 +2,14 @@ package configx
 
 import (
 	"fmt"
+	"gin-demo/pkg/logx/zapx"
 	"gin-demo/pkg/mysqlx"
 	"gin-demo/pkg/redisx"
 )
 
 type Config interface {
 	ReadSection(string, interface{}) error
+	//GetConfig() (interface{}, error)
 }
 
 type ConfigX struct {
@@ -30,4 +32,13 @@ func (c *ConfigX) GetRedisConfig() (*redisx.RedisConfig, error) {
 		return nil, err
 	}
 	return &redisConfig, nil
+}
+
+func (c *ConfigX) GetLogConfig() (*zapx.Config, error) {
+	var logConfig zapx.Config
+	err := c.Driver.ReadSection("Log", &logConfig)
+	if err != nil {
+		return nil, err
+	}
+	return &logConfig, nil
 }
