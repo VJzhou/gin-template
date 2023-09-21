@@ -58,3 +58,5 @@ func getHook(config *Config, filename string) *lumberjack.Logger {
 		LocalTime:  true,              // 备份文件名本地/UTC时间
 	}
 }
+
+// https://github.com/jianghushinian/gokit/blob/main/log/zap/log.go
