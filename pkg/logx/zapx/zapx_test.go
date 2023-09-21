@@ -7,7 +7,7 @@ import (
 
 func TestNewLogger(t *testing.T) {
 	config := getConfig(consoleEncoder)
-	zapLogger, _ := New(config)
+	logger, _ := New(config)
 
 	defer Sync()
 	logx.Debug("debug msg")

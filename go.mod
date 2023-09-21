@@ -1,4 +1,4 @@
-module gin-demo
+module gin-template
 
 go 1.15
 
@@ -24,8 +24,8 @@ require (
 	github.com/swaggo/swag v1.6.9
 	github.com/ugorji/go v1.2.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.25.0
-	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
+	go.uber.org/zap v1.26.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.4
 )
