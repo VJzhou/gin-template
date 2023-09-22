@@ -1,4 +1,4 @@
-package logx1
+package zapx
 
 import (
 	"go.uber.org/zap"
@@ -18,7 +18,6 @@ func NewTee(tees []TeeOption, opts ...zap.Option) *Logger {
 	for _, tee := range tees {
 		core := zapcore.NewCore(
 			tee.encoder,
-			//zapcore.AddSync(tee.Out),
 			zapcore.NewMultiWriteSyncer(tee.ws...),
 			zap.LevelEnablerFunc(tee.LevelEnablerFunc),
 		)

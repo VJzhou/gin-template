@@ -3,39 +3,13 @@ package zapx
 import (
 	"fmt"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"time"
 )
-
-var _ Encoder = (*ConsoleEncoder)(nil)
 
 type ConsoleEncoder struct {
 	raw    string
 	logger *zap.Logger
 }
 
-func NewConsoleEncoder() *ConsoleEncoder {
-	return &ConsoleEncoder{}
-}
-
-func GetConsoleZapCoreEncoder() zapcore.Encoder {
-	config := zap.NewProductionEncoderConfig()
-	// 时间格式自定义
-	config.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-		enc.AppendString("[" + t.Format("2006-01-02 15:04:05") + "]")
-	}
-	// 打印路径自定义
-	config.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString("[" + getFilePath(&caller) + "]")
-	}
-	// 级别显示自定义
-	config.EncodeLevel = func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString("[" + level.String() + "]")
-	}
-	return zapcore.NewConsoleEncoder(config)
-}
-
-// WithKey 添加单个键.
 func (ce *ConsoleEncoder) WithKey(key string) Encoder {
 	ce.raw = ce.raw + "[" + key + "]    "
 	return ce

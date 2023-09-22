@@ -1,9 +1,18 @@
 package zapx
 
-import "go.uber.org/zap/zapcore"
+import (
+	"go.uber.org/zap"
+	"go.uber.org/zap/buffer"
+	"go.uber.org/zap/zapcore"
+	"time"
+)
+
+var (
+	consoleEncoder = "console"
+	jsonEncoder    = "json"
+)
 
 type Encoder interface {
-	//GetEncoder() zapcore.Encoder
 	WithKey(key string) Encoder
 	WithField(key, val string) Encoder
 	Debug(msg string)
@@ -18,33 +27,86 @@ type Encoder interface {
 	Fatalf(format string, v ...interface{})
 }
 
-var (
-	consoleEncoder = "console"
-	jsonEncoder    = "json"
-)
+func NewEncoder(encoderStr string, logger *zap.Logger) Encoder {
+	var encoder Encoder
+	switch encoderStr {
+	case jsonEncoder:
+		encoder = &JsonEncoder{
+			fields: make([]zap.Field, 0),
+			val:    "",
+			logger: logger,
+		}
+	case consoleEncoder:
+		encoder = &ConsoleEncoder{
+			raw:    "",
+			logger: logger,
+		}
+	default:
+		encoder = &ConsoleEncoder{
+			raw:    "",
+			logger: logger,
+		}
+	}
+	return encoder
+}
 
-func GetZapEncoder(encoder string) zapcore.Encoder {
+func GetZapCoreEncoder(encoder string) zapcore.Encoder {
 	var zapEncoder zapcore.Encoder
 	switch encoder {
 	case jsonEncoder:
-		zapEncoder = GetJsonZapCoreEncoder()
+		zapEncoder = NewJsonEncoder()
 	case consoleEncoder:
-		zapEncoder = GetConsoleZapCoreEncoder()
+		zapEncoder = NewConsoleEncoder()
 	default:
-		zapEncoder = GetConsoleZapCoreEncoder()
+		zapEncoder = NewConsoleEncoder()
 	}
 	return zapEncoder
 }
 
-//func GetEncoder(encoder string) Encoder {
-//	var localEncoder Encoder
-//	switch encoder {
-//	case jsonEncoder:
-//		localEncoder = NewJsonEncoder()
-//	case consoleEncoder:
-//		localEncoder = NewConsoleEncoder()
-//	default:
-//		localEncoder = NewConsoleEncoder()
-//	}
-//	return localEncoder
-//}
+func NewJsonEncoder() zapcore.Encoder {
+	config := zap.NewProductionEncoderConfig()
+
+	config.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.Format("2006-01-02 15:04:05"))
+	}
+
+	config.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(getFilePath(&caller))
+	}
+
+	config.EncodeLevel = func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(level.String())
+	}
+
+	return zapcore.NewJSONEncoder(config)
+}
+
+func NewConsoleEncoder() zapcore.Encoder {
+	config := zap.NewProductionEncoderConfig()
+	// 时间格式自定义
+	config.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString("[" + t.Format("2006-01-02 15:04:05") + "]")
+	}
+	// 打印路径自定义
+	config.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString("[" + getFilePath(&caller) + "]")
+	}
+	// 级别显示自定义
+	config.EncodeLevel = func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString("[" + level.String() + "]")
+	}
+	return zapcore.NewConsoleEncoder(config)
+}
+
+func getFilePath(ec *zapcore.EntryCaller) string {
+	if !ec.Defined {
+		return "undefined"
+	}
+	buf := buffer.NewPool().Get()
+	buf.AppendString(ec.Function)
+	buf.AppendByte(':')
+	buf.AppendInt(int64(ec.Line))
+	caller := buf.String()
+	buf.Free()
+	return caller
+}

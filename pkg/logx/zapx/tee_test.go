@@ -1,4 +1,4 @@
-package logx1
+package zapx
 
 import (
 	"go.uber.org/zap"
@@ -11,17 +11,17 @@ import (
 func TestTee(t *testing.T) {
 	config := &Config{
 		FilePath:   "./logs/x.log",
-		Encoder:    "console",
+		Encoder:    "json",
 		MaxSize:    100,
 		MaxBackups: 10,
 		MaxAge:     30,
 	}
-	encoder := GetEncoder(config.Encoder)
+	encoder := GetZapCoreEncoder(config.Encoder)
 	tees := []TeeOption{
 		{
 			ws: []zapcore.WriteSyncer{
 				zapcore.AddSync(os.Stdout),
-				//zapcore.AddSync(getHook(config, config.GetInfoPath())),
+				zapcore.AddSync(getHook(config, config.GetInfoPath())),
 			},
 			LevelEnablerFunc: func(level Level) bool {
 				return level <= zap.InfoLevel
@@ -31,7 +31,7 @@ func TestTee(t *testing.T) {
 		{
 			ws: []zapcore.WriteSyncer{
 				zapcore.AddSync(os.Stdout),
-				//zapcore.AddSync(getHook(config, config.GetErrPath())),
+				zapcore.AddSync(getHook(config, config.GetErrPath())),
 			},
 			LevelEnablerFunc: func(level Level) bool {
 				return level > zap.InfoLevel
@@ -39,7 +39,15 @@ func TestTee(t *testing.T) {
 			encoder: encoder,
 		},
 	}
-	logger := NewTee(tees)
+
+	// 开启开发模式，堆栈跟踪
+	caller := zap.AddCaller()
+	// 开发模式
+	development := zap.Development()
+	// 二次封装
+	skip := zap.AddCallerSkip(1)
+
+	logger := NewTee(tees, caller, development, skip)
 
 	defer logger.Sync()
 
@@ -58,5 +66,3 @@ func getHook(config *Config, filename string) *lumberjack.Logger {
 		LocalTime:  true,              // 备份文件名本地/UTC时间
 	}
 }
-
-// https://github.com/jianghushinian/gokit/blob/main/log/zap/log.go
