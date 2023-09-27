@@ -19,24 +19,24 @@ func TestTee(t *testing.T) {
 	encoder := GetZapCoreEncoder(config.Encoder)
 	tees := []TeeOption{
 		{
-			ws: []zapcore.WriteSyncer{
+			Ws: []zapcore.WriteSyncer{
 				zapcore.AddSync(os.Stdout),
 				zapcore.AddSync(getHook(config, config.GetInfoPath())),
 			},
 			LevelEnablerFunc: func(level Level) bool {
 				return level <= zap.InfoLevel
 			},
-			encoder: encoder,
+			Encoder: encoder,
 		},
 		{
-			ws: []zapcore.WriteSyncer{
+			Ws: []zapcore.WriteSyncer{
 				zapcore.AddSync(os.Stdout),
 				zapcore.AddSync(getHook(config, config.GetErrPath())),
 			},
 			LevelEnablerFunc: func(level Level) bool {
 				return level > zap.InfoLevel
 			},
-			encoder: encoder,
+			Encoder: encoder,
 		},
 	}
 

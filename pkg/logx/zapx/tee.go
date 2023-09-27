@@ -8,17 +8,17 @@ import (
 type LevelEnablerFunc func(Level) bool
 
 type TeeOption struct {
-	ws []zapcore.WriteSyncer
+	Ws []zapcore.WriteSyncer
 	LevelEnablerFunc
-	encoder zapcore.Encoder
+	Encoder zapcore.Encoder
 }
 
 func NewTee(tees []TeeOption, opts ...zap.Option) *Logger {
 	var cores []zapcore.Core
 	for _, tee := range tees {
 		core := zapcore.NewCore(
-			tee.encoder,
-			zapcore.NewMultiWriteSyncer(tee.ws...),
+			tee.Encoder,
+			zapcore.NewMultiWriteSyncer(tee.Ws...),
 			zap.LevelEnablerFunc(tee.LevelEnablerFunc),
 		)
 		cores = append(cores, core)

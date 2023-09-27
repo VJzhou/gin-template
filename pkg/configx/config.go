@@ -2,9 +2,9 @@ package configx
 
 import (
 	"fmt"
-	"gin-demo/pkg/logx/zapx"
-	"gin-demo/pkg/mysqlx"
-	"gin-demo/pkg/redisx"
+	"gin-template/pkg/logx/zapx"
+	"gin-template/pkg/mysqlx"
+	"gin-template/pkg/redisx"
 )
 
 type Config interface {

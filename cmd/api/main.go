@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"gin-demo/pkg/configx"
-	"gin-demo/pkg/mysqlx"
-	"gin-demo/pkg/redisx"
+	"gin-template/pkg/configx"
+	"gin-template/pkg/logx/zapx"
+	"gin-template/pkg/mysqlx"
+	"gin-template/pkg/redisx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"log"
-	"time"
+	"os"
 )
 
 // @title Docker监控服务
@@ -38,29 +39,6 @@ func main() {
 	//if err != nil {
 	//  log.Printf("Server err: %v", err)
 	//}
-
-	conf := zap.NewProductionConfig()
-
-	conf.Encoding = "console"
-
-	format := "[%s]"
-
-	conf.EncoderConfig.EncodeTime = func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(fmt.Sprintf(format, t.Format("2006-01-02 15:04:05")))
-	}
-
-	conf.EncoderConfig.EncodeCaller = func(caller zapcore.EntryCaller, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(fmt.Sprintf(format, caller.TrimmedPath()))
-	}
-
-	conf.EncoderConfig.EncodeLevel = func(level zapcore.Level, encoder zapcore.PrimitiveArrayEncoder) {
-		encoder.AppendString(fmt.Sprintf(format, level.String()))
-	}
-
-	logger, _ := conf.Build()
-	logger.Info("service start")
-
-	logger.Info("info msg", zap.String("haha", "name"), zap.Int("age", 18), zap.Duration("timer", time.Minute))
 
 	config, err := initConfig()
 	if err != nil {
@@ -138,4 +116,47 @@ func initRedis(config *configx.ConfigX) error {
 		return err
 	}
 	return redisx.New(redisConfig)
+}
+
+func initLog(config *configx.ConfigX) error {
+
+	logConfig, err := config.GetLogConfig()
+	if err != nil {
+		return err
+	}
+
+	encoder := zapx.GetZapCoreEncoder(logConfig.Encoder)
+	tees := []zapx.TeeOption{
+		{
+			Ws: []zapcore.WriteSyncer{
+				zapcore.AddSync(os.Stdout),
+				zapcore.AddSync(zapx.getHook(config, config.GetInfoPath())),
+			},
+			LevelEnablerFunc: func(level zapx.Level) bool {
+				return level <= zap.InfoLevel
+			},
+			Encoder: encoder,
+		},
+		{
+			Ws: []zapcore.WriteSyncer{
+				zapcore.AddSync(os.Stdout),
+				zapcore.AddSync(getHook(config, config.GetErrPath())),
+			},
+			LevelEnablerFunc: func(level zapx.Level) bool {
+				return level > zap.InfoLevel
+			},
+			Encoder: encoder,
+		},
+	}
+
+	// 开启开发模式，堆栈跟踪
+	caller := zap.AddCaller()
+	// 开发模式
+	development := zap.Development()
+	// 二次封装
+	skip := zap.AddCallerSkip(1)
+
+	logger := zapx.NewTee(tees, caller, development, skip)
+
+	defer logger.Sync()
 }

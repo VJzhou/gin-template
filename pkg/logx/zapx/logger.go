@@ -7,6 +7,8 @@ import (
 	"os"
 )
 
+var logger *Logger
+
 type (
 	Level = zapcore.Level
 
