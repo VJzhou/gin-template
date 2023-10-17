@@ -1,9 +1,9 @@
 package routers
 
 import (
-	"gin-demo/conf"
-	"gin-demo/pkg/app"
-	"gin-demo/pkg/upload"
+	"gin-template/conf"
+	"gin-template/pkg/app"
+	"gin-template/pkg/upload"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

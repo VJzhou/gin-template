@@ -14,3 +14,11 @@ Mysql:
   ParseTime: True
   MaxIdleConns: 10
   MaxOpenConns: 30
+
+Log:
+  FilePath: ./logs/x.log
+  Encoder: json
+  MaxSize: 100,
+  MaxBackups: 10,
+  MaxAge: 30,
+

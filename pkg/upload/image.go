@@ -2,9 +2,8 @@ package upload
 
 import (
 	"fmt"
-	"gin-demo/conf"
-	"gin-demo/pkg/file"
-	"gin-demo/pkg/logx"
+	"gin-template/conf"
+	"gin-template/pkg/file"
 	"log"
 	"mime/multipart"
 	"os"
@@ -44,7 +43,7 @@ func CheckImageSize(f multipart.File) bool {
 	size, err := file.GetSize(f)
 	if err != nil {
 		log.Println(err)
-		logx.Warn(err)
+		//logx.Warn(err)
 		return false
 	}
 	return size <= conf.AppConfig.ImagaMaxSize

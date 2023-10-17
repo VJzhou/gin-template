@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gin-template/pkg/configx"
+	"gin-template/pkg/logx"
 	"gin-template/pkg/logx/zapx"
 	"gin-template/pkg/mysqlx"
 	"gin-template/pkg/redisx"
@@ -44,6 +45,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+
 	mysqlConfig, _ := config.GetMysqlConfig()
 	log.Println("mysql config", mysqlConfig)
 
@@ -56,6 +58,13 @@ func main() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+
+	_ = initLog(config)
+	logx.Info("haha")
+	logx.Debug("debug")
+	logx.Error("error")
+
+	defer logx.Sync()
 
 	//logging.Setup()
 	//
@@ -86,7 +95,6 @@ func main() {
 	//	log.Fatal("Server Shutdown:", err)
 	//}
 
-	log.Println("Server exiting")
 }
 
 func initConfig() (*configx.ConfigX, error) {
@@ -130,7 +138,7 @@ func initLog(config *configx.ConfigX) error {
 		{
 			Ws: []zapcore.WriteSyncer{
 				zapcore.AddSync(os.Stdout),
-				zapcore.AddSync(zapx.getHook(config, config.GetInfoPath())),
+				zapcore.AddSync(zapx.GetHook(logConfig, logConfig.GetInfoPath())),
 			},
 			LevelEnablerFunc: func(level zapx.Level) bool {
 				return level <= zap.InfoLevel
@@ -140,7 +148,7 @@ func initLog(config *configx.ConfigX) error {
 		{
 			Ws: []zapcore.WriteSyncer{
 				zapcore.AddSync(os.Stdout),
-				zapcore.AddSync(getHook(config, config.GetErrPath())),
+				zapcore.AddSync(zapx.GetHook(logConfig, logConfig.GetErrPath())),
 			},
 			LevelEnablerFunc: func(level zapx.Level) bool {
 				return level > zap.InfoLevel
@@ -158,5 +166,7 @@ func initLog(config *configx.ConfigX) error {
 
 	logger := zapx.NewTee(tees, caller, development, skip)
 
-	defer logger.Sync()
+	// defer logger.Sync()
+	zapx.SetLogger(logger)
+	return nil
 }
