@@ -2,6 +2,7 @@ package configx
 
 import (
 	"fmt"
+	"gin-template/conf"
 	"gin-template/pkg/logx/zapx"
 	"gin-template/pkg/mysqlx"
 	"gin-template/pkg/redisx"
@@ -14,6 +15,16 @@ type Config interface {
 
 type ConfigX struct {
 	Driver Config
+}
+
+func (c *ConfigX) GetServerConfig() (*conf.ServerConfigX, error) {
+	var serverConfig conf.ServerConfigX
+	err := c.Driver.ReadSection("Server", &serverConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return &serverConfig, nil
 }
 
 func (c *ConfigX) GetMysqlConfig() (*mysqlx.MysqlConfig, error) {

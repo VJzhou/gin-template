@@ -2,99 +2,64 @@ package main
 
 import (
 	"fmt"
+	"gin-template/conf"
 	"gin-template/pkg/configx"
 	"gin-template/pkg/logx"
 	"gin-template/pkg/logx/zapx"
 	"gin-template/pkg/mysqlx"
 	"gin-template/pkg/redisx"
+	"gin-template/routers"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"log"
+	"net/http"
 	"os"
 )
 
-// @title Docker监控服务
-// @version 1.0
-// @description docker监控服务后端API接口文档
-
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @host 127.0.0.1:8088
 func main() {
 
-	// 热更新 创建子进程，将原进程退出
-	//endless.DefaultReadTimeOut = setting.ReadTimeout
-	//endless.DefaultWriteTimeOut = setting.WriteTimeout
-	//endless.DefaultMaxHeaderBytes = 1 << 20
-	//endPoint := fmt.Sprintf(":%d", setting.HTTPPort)
-	//
-	//server := endless.NewServer(endPoint, routers.InitRouter())
-	//server.BeforeBegin = func(add string) {
-	//  log.Printf("Actual pid is %d", syscall.Getpid())
-	//}
-	//
-	//err := server.ListenAndServe()
-	//if err != nil {
-	//  log.Printf("Server err: %v", err)
-	//}
+	// TODO 热更新 创建子进程，将原进程退出
 
 	config, err := initConfig()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	mysqlConfig, _ := config.GetMysqlConfig()
-	log.Println("mysql config", mysqlConfig)
+	err = initLog(config)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	defer logx.Sync()
 
 	err = initMysql(config)
 	if err != nil {
-		log.Fatalln(err.Error())
+		logx.Error(err.Error())
 	}
 
 	err = initRedis(config)
 	if err != nil {
-		log.Fatalln(err.Error())
+		logx.Error(err.Error())
 	}
 
-	_ = initLog(config)
-	logx.Info("haha")
-	logx.Debug("debug")
-	logx.Error("error")
+	svrConfig, err := initServer(config)
+	if err != nil {
+		logx.Error(err.Error())
+	}
 
-	defer logx.Sync()
+	// http shutdown
+	router := routers.InitRouter()
+	server := &http.Server{
+		Addr:           fmt.Sprintf(":%s", svrConfig.HttpPort),
+		Handler:        router,
+		ReadTimeout:    svrConfig.ReadTimeout,
+		WriteTimeout:   svrConfig.WriteTimeout,
+		MaxHeaderBytes: 1 << 20,
+	}
 
-	//logging.Setup()
-	//
-	//// http shutdown
-	//router := routers.InitRouter()
-	//server := &http.Server{
-	//	Addr:           fmt.Sprintf(":%d", conf.ServerConfig.HttpPort),
-	//	Handler:        router,
-	//	ReadTimeout:    conf.ServerConfig.ReadTimeout,
-	//	WriteTimeout:   conf.ServerConfig.WriteTimeout,
-	//	MaxHeaderBytes: 1 << 20,
-	//}
-	//
-	//go func() {
-	//	if err := server.ListenAndServe(); err != nil {
-	//		log.Printf("Listen: %s\n", err)
-	//	}
-	//}()
-	//
-	//quit := make(chan os.Signal)
-	//signal.Notify(quit, os.Interrupt)
-	//<-quit
-	//
-	//log.Println("Shutdown Server")
-	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	//defer cancel()
-	//if err := server.Shutdown(ctx); err != nil {
-	//	log.Fatal("Server Shutdown:", err)
-	//}
-
+	err = server.ListenAndServe()
+	if err != nil {
+		logx.Error(err.Error())
+	}
 }
 
 func initConfig() (*configx.ConfigX, error) {
@@ -108,6 +73,14 @@ func initConfig() (*configx.ConfigX, error) {
 	}
 
 	return config, err
+}
+
+func initServer(config *configx.ConfigX) (*conf.ServerConfigX, error) {
+	serverConfig, err := config.GetServerConfig()
+	if err != nil {
+		return nil, err
+	}
+	return serverConfig, nil
 }
 
 func initMysql(config *configx.ConfigX) error {
@@ -127,7 +100,6 @@ func initRedis(config *configx.ConfigX) error {
 }
 
 func initLog(config *configx.ConfigX) error {
-
 	logConfig, err := config.GetLogConfig()
 	if err != nil {
 		return err
@@ -166,7 +138,6 @@ func initLog(config *configx.ConfigX) error {
 
 	logger := zapx.NewTee(tees, caller, development, skip)
 
-	// defer logger.Sync()
 	zapx.SetLogger(logger)
 	return nil
 }
