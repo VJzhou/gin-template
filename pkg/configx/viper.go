@@ -1,6 +1,8 @@
 package configx
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
 var _ Config = (*ViperX)(nil)
 
@@ -12,7 +14,7 @@ type ViperX struct {
 func NewViperX() (*ViperX, error) {
 	vp := viper.New()
 	vp.SetConfigName("config") // 设置配置文件名称
-	vp.AddConfigPath("conf/")
+	vp.AddConfigPath("etc/")
 	vp.SetConfigType("yaml")
 	err := vp.ReadInConfig()
 	if err != nil {

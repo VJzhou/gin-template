@@ -1,6 +1,8 @@
 package configx
 
-import "github.com/go-ini/ini"
+import (
+	"github.com/go-ini/ini"
+)
 
 var _ Config = (*IniX)(nil)
 

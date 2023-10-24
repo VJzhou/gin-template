@@ -8,7 +8,7 @@ import (
 
 var db *gorm.DB
 
-type MysqlConfig struct {
+type Config struct {
 	User         string
 	Password     string
 	Host         string
@@ -20,12 +20,12 @@ type MysqlConfig struct {
 	MaxOpenConns int
 }
 
-func (c *MysqlConfig) Dsn() string {
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=%t&loc=Local", c.User, c.Password, c.Host, c.DBName, c.Charset, c.ParseTime)
-	return dsn
+func (dsn *Config) Dsn() string {
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=%t&loc=Local",
+		dsn.User, dsn.Password, dsn.Host, dsn.DBName, dsn.Charset, dsn.ParseTime)
 }
 
-func New(config *MysqlConfig) error {
+func New(config *Config) error {
 	db, err := gorm.Open(mysql.Open(config.Dsn()), &gorm.Config{})
 	if err != nil {
 		return err

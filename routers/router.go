@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"gin-template/conf"
+	"gin-template/config"
 	"github.com/gin-gonic/gin"
 	_ "github.com/swaggo/gin-swagger/example/basic/docs"
 	"net/http"
@@ -18,7 +18,7 @@ func InitRouter() *gin.Engine {
 
 	route.Use(gin.Recovery())
 
-	gin.SetMode(conf.ServerConfig.RunMode)
+	gin.SetMode(config.ServerConfig().RunMode)
 
 	// 注册路由
 	v1Api := route.Group("/v1")

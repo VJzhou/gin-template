@@ -1,0 +1,28 @@
+Server:
+  RunMode: debug
+  HttpPort: 8080
+  ReadTimeout: 60s
+  WriteTimeout: 60s
+
+Mysql:
+  User: root
+  Password: 123456
+  Host: 106.12.109.215:3306
+  DBName: mypay
+  TablePrefix: commerce_
+  Charset: utf8mb4
+  ParseTime: True
+  MaxIdleConns: 10
+  MaxOpenConns: 30
+
+Redis:
+  Host: 106.12.109.215:6379
+  Password:
+  DB: 0
+
+Log:
+  FilePath: /Users/zhouweijie/go-workspace/gin-template/logs/x.log
+  Encoder: json
+  MaxSize: 100
+  MaxBackups: 10
+  MaxAge: 30

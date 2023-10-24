@@ -2,7 +2,6 @@ package upload
 
 import (
 	"fmt"
-	"gin-template/conf"
 	"gin-template/pkg/file"
 	"log"
 	"mime/multipart"
@@ -11,7 +10,7 @@ import (
 )
 
 func GetImageFullUrl(name string) string {
-	return conf.AppConfig.ImagePrefixPath + "/" + GetImagePath() + name
+	return etc.AppConfig.ImagePrefixPath + "/" + GetImagePath() + name
 }
 
 //func GetImageName(name string) string {
@@ -22,16 +21,16 @@ func GetImageFullUrl(name string) string {
 //}
 
 func GetImagePath() string {
-	return conf.AppConfig.ImageSavePath
+	return etc.AppConfig.ImageSavePath
 }
 
 func GetImageFullPath() string {
-	return conf.AppConfig.RuntimeRootPath + GetImagePath()
+	return etc.AppConfig.RuntimeRootPath + GetImagePath()
 }
 
 func CheckImageExt(filename string) bool {
 	ext := file.GetExt(filename)
-	for _, allowExt := range conf.AppConfig.ImageAllowExts {
+	for _, allowExt := range etc.AppConfig.ImageAllowExts {
 		if strings.ToUpper(allowExt) == strings.ToUpper(ext) {
 			return true
 		}
@@ -46,7 +45,7 @@ func CheckImageSize(f multipart.File) bool {
 		//logx.Warn(err)
 		return false
 	}
-	return size <= conf.AppConfig.ImagaMaxSize
+	return size <= etc.AppConfig.ImagaMaxSize
 }
 
 func CheckImage(src string) error {

@@ -8,7 +8,7 @@ import (
 
 var client *redis.Client
 
-type RedisConfig struct {
+type Config struct {
 	Host                  string
 	Password              string
 	DB                    int
@@ -26,7 +26,7 @@ func GetClient() *redis.Client {
 	return client
 }
 
-func New(config *RedisConfig) error {
+func New(config *Config) error {
 	client = redis.NewClient(&redis.Options{
 		Addr:                  config.Host,
 		DB:                    config.DB,
